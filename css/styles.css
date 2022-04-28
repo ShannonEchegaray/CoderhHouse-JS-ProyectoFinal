@@ -53,7 +53,12 @@ header div{
     margin: 0 5px;
     text-decoration: none;
     color: #eee;
-    padding: 10px 2px
+    padding: 10px 2px;
+    border-radius: 10px;
+}
+
+.header__button:hover{
+    background-color: rgba(0, 0, 0, 0.259);
 }
 
 .main{
@@ -88,7 +93,7 @@ header div{
 }
 
 .contenedor__titulo{
-    margin: 0 0 0 1em;
+    width: 100%;
     display: flex;
     justify-content: space-between;
 }
@@ -109,8 +114,12 @@ header div{
 
 .card__title{
     text-align: center;
+    width: 60%;
     font-size: 1em;
     margin: 0 0 0.6em 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
     flex-grow: 1;
 }
 
@@ -118,6 +127,9 @@ header div{
     margin-top: 0.2em;
     margin-bottom: 0.2em;
     padding-left: 1em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .card__agregar{
@@ -233,7 +245,7 @@ header div{
     flex-flow: column nowrap;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 20px 20px 30px 20px;
 }
 
 .alerta__producto__input{
@@ -243,7 +255,12 @@ header div{
 }
 
 .alerta__producto__contenedor__botones{
-    margin-top: 0.4em;
+    margin-top: 0.4em;  
+}
+
+.alerta__producto__eliminar{
+    text-overflow: clip;
+    overflow: hidden;
 }
 
 .alerta__producto__aceptar{
@@ -252,7 +269,7 @@ header div{
     background-color: #77f;
     color: #eee;
     cursor: pointer;
-    margin: 0.4em;
+    margin: 1em 0.4em;
 }
 
 .alerta__producto__cancelar{
@@ -261,7 +278,7 @@ header div{
     background-color: #f77;
     color: #eee;
     cursor: pointer;
-    margin: 0.4em;
+    margin: 1em 0.4em;
 }
 /* Alerta de Comprar y vender */
 

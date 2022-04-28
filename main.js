@@ -1,8 +1,9 @@
 //Variables generales
-const categorias = ["Carne", "Verdura"];
-const productos = [];
+const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
+const productos = JSON.parse(localStorage.getItem("productos")) || [];
 const historialCompras = [];
 const historialVentas = [];
+let darkMode = JSON.parse(localStorage.getItem("modoOscuro")) || false;
 
 //Clases usadas en el programa
 class Producto{
@@ -38,166 +39,6 @@ class Lista{
     }
 }
 
-
-const crearProducto = () => {
-    let id = 1;
-    while(productos.find(el => el.id == id)){
-        id++;
-    }
-    return id;
-}
-// Pusheo algunos productos en la lista.
-
-productos.push(new Producto(1,"Lechuga", "Verdura", 0, 50, 20));
-productos.push(new Producto(2,"Pollo", "Carne", 0, 120, 50));
-productos.push(new Producto(3,"Res", "Carne", 0, 180, 80));
-
-let darkMode = false;
-
-// Funcion para verificar si usar la clase oscura o no
-const verificarModo = (clase) => {
-    if(darkMode){
-        clase += "--dark"
-        return clase;
-    }
-    return clase;
-}
-
-// Renderizar productos del main
-function renderProductos(){
-
-    let volcar = document.getElementById("volcar");
-    while(volcar.firstChild) {
-        volcar.removeChild(volcar.firstChild);
-    }
-    
-    for(const producto of productos){
-        let card = document.createElement("div");
-        card.setAttribute("class", verificarModo("card"));
-
-        let card__body = document.createElement("div");
-        card__body.classList.add("card__body");
-        card.appendChild(card__body);
-
-        let contenedor__titulo = document.createElement("div");
-        contenedor__titulo.classList.add("contenedor__titulo");
-        card__body.appendChild(contenedor__titulo);
-
-        let titulo = document.createElement("h5");
-        titulo.classList.add("card__title");
-        titulo.innerText = producto.nombre;
-        contenedor__titulo.appendChild(titulo);
-
-        let contenedor__iconos = document.createElement("div");
-
-        let ico__modificar = document.createElement("a");
-        ico__modificar.setAttribute("href", "#");
-        ico__modificar.innerHTML = `<svg class="${verificarModo("ico__productos")}" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-        </svg>`;
-
-        let ico__eliminar = document.createElement("a");
-        ico__eliminar.setAttribute("href", "#");
-        ico__eliminar.innerHTML = `<svg class="${verificarModo("ico__productos")}" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z"/>
-        <path fill-rule="evenodd" d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z"/>
-        </svg>`;
-
-        ico__modificar.onclick = () => {
-            insertOrModify(false, producto.id);
-        }
-
-        ico__eliminar.onclick = () => {
-            eliminarProducto(producto.id);
-        }
-
-        contenedor__iconos.appendChild(ico__modificar);
-        contenedor__iconos.appendChild(ico__eliminar);
-        contenedor__titulo.appendChild(contenedor__iconos)
-
-        let card__text1 = document.createElement("p");
-        let card__text2 = document.createElement("p");
-        let card__text3 = document.createElement("p");
-        let card__text4 = document.createElement("p");
-
-        card__text1.classList.add("card__text");
-        card__text2.classList.add("card__text");
-        card__text3.classList.add("card__text");
-        card__text4.classList.add("card__text");
-
-        card__text1.innerText = `Categoria: ${producto.categoria}`;
-        card__text2.innerText = `Cantidad: ${producto.cantidad}`;
-        card__text3.innerText = `Precio: ${producto.precio}`;
-        card__text4.innerText = `Costo: ${producto.costo}`;
-
-        card__body.appendChild(card__text1);
-        card__body.appendChild(card__text2);
-        card__body.appendChild(card__text3);
-        card__body.appendChild(card__text4);
-
-        volcar.appendChild(card);
-    } 
-    
-    let card = document.createElement("div");
-    card.classList.add(verificarModo("card__agregar"));
-    card.innerHTML = `<svg class="${verificarModo("card__agregar__icon")} " xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-    </svg>`
-    card.onclick = () => {
-        insertOrModify(true);
-    }
-    volcar.appendChild(card);
-}
-
-//funcion Para setear el header, main, footer y alertas en modo oscuro
-function setDark(){
-    const body = document.querySelector("body");
-    body.classList.remove("body");
-    body.classList.add("body--dark");
-    const header = document.querySelector("header");
-    header.classList.remove("header");
-    header.classList.add("header--dark");
-    const footer = document.querySelector("footer");
-    footer.classList.remove("footer");
-    footer.classList.add("footer--dark");
-    if(document.querySelector(".alert")){
-        let alerta = document.querySelector(".alert");
-        alerta.classList.remove("alert");
-        alerta.classList.add("alert--dark")        
-    }
-    darkMode = true;
-    renderProductos()
-}
-
-//funcion Para setear el header, main, footer y alertas en modo claro
-function setLight(){
-    const body = document.querySelector("body");
-    body.classList.remove("body--dark");
-    body.classList.add("body");
-    const header = document.querySelector("header");
-    header.classList.remove("header--dark");
-    header.classList.add("header");
-    const footer = document.querySelector("footer");
-    footer.classList.remove("footer--dark");
-    footer.classList.add("footer");
-    if(document.querySelector(".alert--dark")){
-        let alerta = document.querySelector(".alert--dark");
-        alerta.classList.remove("alert--dark");
-        alerta.classList.add("alert")        
-    }
-    darkMode = false;
-    renderProductos()
-}
-
-renderProductos();
-document.querySelector("#modoPagina").onclick = () => {
-    if(darkMode){
-        setLight();
-    } else {
-        setDark();
-    }
-}
-
 class Alerta{
     constructor(tamanox, tamanoy){
         this.fondo = document.createElement("div");
@@ -212,7 +53,7 @@ class Alerta{
         } else {
             this.alerta.style.width = `${tamanox}vw`
         }
-        this.alerta.style.height = `${tamanoy}vh`
+        this.alerta.style.minHeight = `${tamanoy}vh`
     
         this.alerta.classList.add(verificarModo("alert"));
     }
@@ -273,6 +114,146 @@ class Alerta{
     }
 }
 
+//
+const crearProducto = () => {
+    let id = 1;
+    while(productos.find(el => el.id == id)){
+        id++;
+    }
+    return id;
+}
+// Pusheo algunos productos en la lista.
+
+// productos.push(new Producto(1,"Lechuga", "Verdura", 0, 50, 20));
+// productos.push(new Producto(2,"Pollo", "Carne", 0, 120, 50));
+// productos.push(new Producto(3,"Res", "Carne", 0, 180, 80));
+
+// Funcion para verificar si usar la clase oscura o no
+const guardarStorage = (valor, keyword) => {
+    valor = JSON.stringify(valor);
+    localStorage.setItem(keyword, valor);
+}
+
+const verificarModo = (clase) => {
+    if(darkMode){
+        clase += "--dark"
+        return clase;
+    }
+    return clase;
+}
+
+// Renderizar productos del main
+const renderProductos = () => {
+
+    let volcar = document.getElementById("volcar");
+    while(volcar.firstChild) {
+        volcar.removeChild(volcar.firstChild);
+    }
+    
+    for(const producto of productos){
+        let card = document.createElement("div");
+        card.setAttribute("class", verificarModo("card"));
+
+        let card__body = document.createElement("div");
+        card__body.classList.add("card__body");
+        card.appendChild(card__body);
+
+        let contenedor__titulo = document.createElement("div");
+        contenedor__titulo.classList.add("contenedor__titulo");
+        card__body.appendChild(contenedor__titulo);
+
+        let titulo = document.createElement("h5");
+        titulo.classList.add("card__title");
+        titulo.innerText = producto.nombre;
+        contenedor__titulo.appendChild(titulo);
+
+        let contenedor__iconos = document.createElement("div");
+        contenedor__iconos.classList.add("contenedor__iconos")
+
+        let ico__modificar = document.createElement("a");
+        ico__modificar.setAttribute("href", "#");
+        ico__modificar.innerHTML = `<svg class="${verificarModo("ico__productos")}" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+        </svg>`;
+
+        let ico__eliminar = document.createElement("a");
+        ico__eliminar.setAttribute("href", "#");
+        ico__eliminar.innerHTML = `<svg class="${verificarModo("ico__productos")}" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z"/>
+        <path fill-rule="evenodd" d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z"/>
+        </svg>`;
+
+        ico__modificar.onclick = () => {
+            insertOrModify(false, producto.id);
+        }
+
+        ico__eliminar.onclick = () => {
+            eliminarProducto(producto.id);
+        }
+
+        contenedor__iconos.appendChild(ico__modificar);
+        contenedor__iconos.appendChild(ico__eliminar);
+        contenedor__titulo.appendChild(contenedor__iconos)
+
+        let card__text1 = document.createElement("p");
+        let card__text2 = document.createElement("p");
+        let card__text3 = document.createElement("p");
+        let card__text4 = document.createElement("p");
+
+        card__text1.classList.add("card__text");
+        card__text2.classList.add("card__text");
+        card__text3.classList.add("card__text");
+        card__text4.classList.add("card__text");
+
+        card__text1.innerText = `Categoria: ${producto.categoria}`;
+        card__text2.innerText = `Cantidad: ${producto.cantidad}`;
+        card__text3.innerText = `Precio: ${producto.precio}`;
+        card__text4.innerText = `Costo: ${producto.costo}`;
+
+        card__body.appendChild(card__text1);
+        card__body.appendChild(card__text2);
+        card__body.appendChild(card__text3);
+        card__body.appendChild(card__text4);
+
+        volcar.appendChild(card);
+    } 
+    
+    let card = document.createElement("div");
+    card.classList.add(verificarModo("card__agregar"));
+    card.innerHTML = `<svg class="${verificarModo("card__agregar__icon")} " xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+    </svg>`
+    card.onclick = () => {
+        insertOrModify(true);
+    }
+    volcar.appendChild(card);
+}
+
+//Se unificaron las funciones para setear alertas
+//funcion Para setear el header, main, footer y alertas en el modo que corresponda
+const setearModo = () => {
+    const body = document.querySelector("body");
+    body.classList = verificarModo("body")
+    const header = document.querySelector("header");
+    header.classList = verificarModo("header")
+    const footer = document.querySelector("footer");
+    footer.classList = verificarModo("footer")
+    if(document.querySelector(".alert--dark") || document.querySelector(".alert")){
+        let alerta = document.querySelector(".alert--dark") || document.querySelector(".alert");
+        alerta.classList = verificarModo("alert")     
+    }
+    renderProductos()
+}
+
+setearModo();
+renderProductos();
+
+document.querySelector("#modoPagina").onclick = () => {
+    darkMode = darkMode ? false : true;
+    guardarStorage(darkMode, "modoOscuro");
+    setearModo();
+}
+
 //Alertas
 const crearAlerta = (comprar) => {
 
@@ -282,7 +263,7 @@ const crearAlerta = (comprar) => {
         document.body.querySelector(".alert__background").remove();
     }
 
-    const nuevaAlerta = new Alerta();
+    const nuevaAlerta = new Alerta(60, 80);
     nuevaAlerta.agregarTitulo("hola")
     const alerta = nuevaAlerta.iniciarAlerta();
     
@@ -534,6 +515,7 @@ const insertOrModify = (eleccion, id) =>{
                 aceptar.onclick = (e) => {
                     e.preventDefault();
                     categorias.push(categoria.value);
+                    guardarStorage(categorias, "categorias");
                     contenedor.remove();
                     valorarProducto();
                 }
@@ -561,6 +543,7 @@ const insertOrModify = (eleccion, id) =>{
             if(eleccion){
                 let productoNuevo = new Producto(crearProducto(), nombre.value, categoria.value, eleccion && parseInt(cantidad.value), parseInt(precio.value), parseInt(costo.value));
                 productos.push(productoNuevo);
+                guardarStorage(productos, "productos")
                 nuevaAlerta.cerrarAlerta()
                 renderProductos();
             } else {
@@ -569,6 +552,7 @@ const insertOrModify = (eleccion, id) =>{
                 productos[buscarProducto].categoria = categoria.value;
                 productos[buscarProducto].precio = precio.value;
                 productos[buscarProducto].costo = costo.value;
+                guardarStorage(productos, "productos")
                 nuevaAlerta.cerrarAlerta()
                 renderProductos();
             }
@@ -589,21 +573,21 @@ const eliminarProducto = (id) => {
         document.body.querySelector(".alert__background").remove();
     }
 
-    const nuevaAlerta = new Alerta(20, 10);
+    const nuevaAlerta = new Alerta(25, 10);
     nuevaAlerta.agregarTitulo("Eliminar Producto");
-    let alerta = nuevaAlerta.iniciarAlerta();
+    nuevaAlerta.iniciarAlerta();
 
     let buscarProducto = productos.find(el => el.id == id);
 
     let contenedor = document.createElement("div");
     contenedor.innerHTML = `
-    <p>¿Esta seguro que desea eliminar ${buscarProducto.nombre}?</p>
+    <p class="alerta__producto__eliminar">¿Esta seguro que desea eliminar ${buscarProducto.nombre}?</p>
     <div class="alerta__producto__contenedor__botones">
         <a href="#" id="eliminarAceptar" class="alerta__producto__aceptar">Aceptar</a>
         <a href="#" id="eliminarCancelar" class="alerta__producto__cancelar">Cancelar</a>
     </div>
     `
-    nuevaAlerta.agregarBody(parrafo__body);
+    nuevaAlerta.agregarBody(contenedor);
     
     let aceptar = contenedor.querySelector("#eliminarAceptar");
     let cancelar = contenedor.querySelector("#eliminarCancelar");
@@ -611,6 +595,7 @@ const eliminarProducto = (id) => {
     aceptar.onclick = () => {
         buscarProducto = productos.indexOf(buscarProducto);
         productos.splice(buscarProducto, 1);
+        guardarStorage(productos, "productos")
         nuevaAlerta.cerrarAlerta();
         renderProductos();
     }
