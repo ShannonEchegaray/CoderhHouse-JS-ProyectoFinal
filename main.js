@@ -48,7 +48,7 @@ class Alerta{
         }
 
         this.alerta = document.createElement("div");
-        if(document.documentElement.scrollWidth < 768){
+        if(document.documentElement.scrollWidth < 480){
             this.alerta.style.width = "95vw"
         } else {
             this.alerta.style.width = `${tamanox}vw`
@@ -114,7 +114,7 @@ class Alerta{
     }
 }
 
-//
+// Funcion para averiguar que id esta desocupada
 const crearProducto = () => {
     let id = 1;
     while(productos.find(el => el.id == id)){
@@ -122,18 +122,14 @@ const crearProducto = () => {
     }
     return id;
 }
-// Pusheo algunos productos en la lista.
 
-// productos.push(new Producto(1,"Lechuga", "Verdura", 0, 50, 20));
-// productos.push(new Producto(2,"Pollo", "Carne", 0, 120, 50));
-// productos.push(new Producto(3,"Res", "Carne", 0, 180, 80));
-
-// Funcion para verificar si usar la clase oscura o no
+// Funcion para una variable en en un storage
 const guardarStorage = (valor, keyword) => {
     valor = JSON.stringify(valor);
     localStorage.setItem(keyword, valor);
 }
 
+// Funcion para verificar si usar la clase oscura o no
 const verificarModo = (clase) => {
     if(darkMode){
         clase += "--dark"
@@ -154,35 +150,34 @@ const renderProductos = () => {
         let card = document.createElement("div");
         card.setAttribute("class", verificarModo("card"));
 
-        let card__body = document.createElement("div");
-        card__body.classList.add("card__body");
-        card.appendChild(card__body);
+        card.innerHTML = `
+        <div class="card__body">
+            <div class="contenedor__titulo">
+                <h5 class="card__title">${producto.nombre}</h5>
+                <div>
+                    <a href="#" class="no-decoration">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil ${verificarModo("ico__productos")}" viewBox="0 0 16 16">
+                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="no-decoration">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg ${verificarModo("ico__productos")}" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z"/>
+                            <path fill-rule="evenodd" d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <p class="card__text">Categoria: ${producto.categoria}</p>
+            <p class="card__text">Cantidad: ${producto.cantidad}</p>
+            <p class="card__text">Precio: ${producto.precio}</p>
+            <p class="card__text">Costo: ${producto.costo}</p>
+        </div>
+        `
 
-        let contenedor__titulo = document.createElement("div");
-        contenedor__titulo.classList.add("contenedor__titulo");
-        card__body.appendChild(contenedor__titulo);
-
-        let titulo = document.createElement("h5");
-        titulo.classList.add("card__title");
-        titulo.innerText = producto.nombre;
-        contenedor__titulo.appendChild(titulo);
-
-        let contenedor__iconos = document.createElement("div");
-        contenedor__iconos.classList.add("contenedor__iconos")
-
-        let ico__modificar = document.createElement("a");
-        ico__modificar.setAttribute("href", "#");
-        ico__modificar.innerHTML = `<svg class="${verificarModo("ico__productos")}" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-        </svg>`;
-
-        let ico__eliminar = document.createElement("a");
-        ico__eliminar.setAttribute("href", "#");
-        ico__eliminar.innerHTML = `<svg class="${verificarModo("ico__productos")}" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z"/>
-        <path fill-rule="evenodd" d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z"/>
-        </svg>`;
-
+        let ico__modificar = card.querySelectorAll("a")[0];
+        let ico__eliminar = card.querySelectorAll("a")[1];
+      
         ico__modificar.onclick = () => {
             insertOrModify(false, producto.id);
         }
@@ -190,30 +185,6 @@ const renderProductos = () => {
         ico__eliminar.onclick = () => {
             eliminarProducto(producto.id);
         }
-
-        contenedor__iconos.appendChild(ico__modificar);
-        contenedor__iconos.appendChild(ico__eliminar);
-        contenedor__titulo.appendChild(contenedor__iconos)
-
-        let card__text1 = document.createElement("p");
-        let card__text2 = document.createElement("p");
-        let card__text3 = document.createElement("p");
-        let card__text4 = document.createElement("p");
-
-        card__text1.classList.add("card__text");
-        card__text2.classList.add("card__text");
-        card__text3.classList.add("card__text");
-        card__text4.classList.add("card__text");
-
-        card__text1.innerText = `Categoria: ${producto.categoria}`;
-        card__text2.innerText = `Cantidad: ${producto.cantidad}`;
-        card__text3.innerText = `Precio: ${producto.precio}`;
-        card__text4.innerText = `Costo: ${producto.costo}`;
-
-        card__body.appendChild(card__text1);
-        card__body.appendChild(card__text2);
-        card__body.appendChild(card__text3);
-        card__body.appendChild(card__text4);
 
         volcar.appendChild(card);
     } 
@@ -245,13 +216,20 @@ const setearModo = () => {
     renderProductos()
 }
 
-setearModo();
-renderProductos();
 
+// Eventos del header
 document.querySelector("#modoPagina").onclick = () => {
     darkMode = darkMode ? false : true;
     guardarStorage(darkMode, "modoOscuro");
     setearModo();
+}
+
+document.querySelector("#comprar").onclick = () => {
+    crearAlerta(true);
+}
+
+document.querySelector("#vender").onclick = () => {
+    crearAlerta();
 }
 
 //Alertas
@@ -259,7 +237,7 @@ const crearAlerta = (comprar) => {
 
     //Verifica si ya hay una alerta creada, y si ya esta creada se elimina la anterior
     if(Alerta.verificarAlertas()){
-        document.body.querySelector(".alert").remove();
+        document.body.querySelector(`.${verificarModo("alert")}`).remove();
         document.body.querySelector(".alert__background").remove();
     }
 
@@ -432,7 +410,7 @@ const crearAlerta = (comprar) => {
 const insertOrModify = (eleccion, id) =>{
 
     if(Alerta.verificarAlertas()){
-        document.body.querySelector(".alert").remove();
+        document.body.querySelector(`.${verificarModo("alert")}`).remove();
         document.body.querySelector(".alert__background").remove();
     }
 
@@ -569,7 +547,7 @@ const insertOrModify = (eleccion, id) =>{
 const eliminarProducto = (id) => {
 
     if(Alerta.verificarAlertas()){
-        document.body.querySelector(".alert").remove();
+        document.body.querySelector(`.${verificarModo("alert")}`).remove();
         document.body.querySelector(".alert__background").remove();
     }
 
@@ -605,11 +583,6 @@ const eliminarProducto = (id) => {
     }
 }
 
-
-document.querySelector("#comprar").onclick = () => {
-    crearAlerta(true);
-}
-
-document.querySelector("#vender").onclick = () => {
-    crearAlerta();
-}
+// Init Modo de pagina y Desplegar productos
+setearModo();
+renderProductos();

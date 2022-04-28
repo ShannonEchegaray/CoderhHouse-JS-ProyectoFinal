@@ -21,6 +21,12 @@
     min-height: calc(100vh - 30px);
 }
 
+/* Para que los a no tengan underlined */
+
+.no-decoration{
+    text-decoration: none;
+}
+
 .header{
     background-color: #77f;
     color: white;
