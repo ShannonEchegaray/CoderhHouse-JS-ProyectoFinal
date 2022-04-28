@@ -104,11 +104,11 @@ function renderProductos(){
         </svg>`;
 
         ico__modificar.onclick = () => {
-            eventoProducto("modificar", producto.id);
+            insertOrModify(false, producto.id);
         }
 
         ico__eliminar.onclick = () => {
-            eventoProducto("eliminar", producto.id);
+            eliminarProducto(producto.id);
         }
 
         contenedor__iconos.appendChild(ico__modificar);
@@ -144,7 +144,7 @@ function renderProductos(){
     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
     </svg>`
     card.onclick = () => {
-        eventoProducto("agregar");
+        insertOrModify(true);
     }
     volcar.appendChild(card);
 }
@@ -215,7 +215,6 @@ class Alerta{
         this.alerta.style.height = `${tamanoy}vh`
     
         this.alerta.classList.add(verificarModo("alert"));
-        this.alerta.classList.add("alert__ComprarVender");
     }
     
     static verificarAlertas(){
@@ -286,7 +285,7 @@ const crearAlerta = (comprar) => {
     const nuevaAlerta = new Alerta();
     nuevaAlerta.agregarTitulo("hola")
     const alerta = nuevaAlerta.iniciarAlerta();
-
+    
     const tabla = document.createElement("div");
     tabla.classList.add(verificarModo("alert__table"));
 
@@ -449,446 +448,178 @@ const crearAlerta = (comprar) => {
     nuevaAlerta.agregarBody(tabla);
 }
 
-const eventoProducto = (eleccion, id) =>{
+const insertOrModify = (eleccion, id) =>{
 
-    function cerrarAlerta(){
-        for(let i = 0; i < 2; i++){
-            document.body.lastChild.remove();
-        }
+    if(Alerta.verificarAlertas()){
+        document.body.querySelector(".alert").remove();
+        document.body.querySelector(".alert__background").remove();
     }
 
-    let alerta__fondo, alerta, alerta__title, alerta__title__parrafo, alerta__title__closeButton, alerta__body, nombre, categoria, cantidad, precio, costo, alerta__producto__boton, error, parrafo__nombre, parrafo__categoria, parrafo__precio, parrafo__costo, parrafo__cantidad, buscarProducto;
+    const nuevaAlerta = new Alerta(20, 45);
+    eleccion ? nuevaAlerta.agregarTitulo("Agregar Producto") : nuevaAlerta.agregarTitulo("Modificar Producto")
+    let alerta = nuevaAlerta.iniciarAlerta();
 
-    switch(eleccion){
-        case "agregar":
+    const divInputs = document.createElement("div");
+    divInputs.classList.add("alerta__producto__body")
+    divInputs.innerHTML = `
+    <p>Nombre:</p>
+    <input type="text" id="inputNombre" placeholder="Nombre" class="alerta__producto__input">
+    <p>Categoria:</p>
+    <input type="text" id="inputCategoria" placeholder="Categoria" class="alerta__producto__input">
+    ${eleccion ? `<p>Cantidad:</p><input type="number" id="inputCantidad" placeholder="Cantidad" class="alerta__producto__input">`: ""}
+    <p>Precio:</p>
+    <input type="number" id="inputPrecio" placeholder="Precio" class="alerta__producto__input">
+    <p>Costo</p>
+    <input type="number" id="inputCosto" placeholder="Costo" class="alerta__producto__input">
+    <p id="alertaError" class="alerta__error"></p>
+    <a href="#" id="alertaBoton" class="${verificarModo("alert__boton")}">${eleccion ? "Agregar Producto" : "Modificar Producto"}</a>
+    `;
 
-            if(document.querySelector(".alert") || document.querySelector(".alert--dark")){
-                cerrarAlerta();
-            }
 
-            alerta__fondo = document.createElement("div");
-            alerta__fondo.classList.add("alert__background");
-            alerta__fondo.onclick = () => {
-                cerrarAlerta();
-            }
+    //Agregando boton y dandole funcionalidad
 
-            //Agregando Alerta al fondo de la alerta
-            alerta = document.createElement("div");
-            alerta.classList.add(verificarModo("alert"));
-            alerta.classList.add("alert__producto");
+    let error = divInputs.querySelector("#alertaError");
+    let boton = divInputs.querySelector("#alertaBoton");
 
-            alerta__title = document.createElement("div");
-            alerta__title.classList.add(verificarModo("alert__title"));
-            alerta.appendChild(alerta__title);
+    
+    let nombre = divInputs.querySelector("#inputNombre");
+    let categoria = divInputs.querySelector("#inputCategoria");
+    let cantidad = eleccion ? divInputs.querySelector("#inputCantidad") : undefined;
+    let precio = divInputs.querySelector("#inputPrecio");
+    let costo = divInputs.querySelector("#inputCosto");    
 
-            //Agregando Parrafo y Boton al Titulo
-            alerta__title__parrafo = document.createElement("p");
-            alerta__title__parrafo.innerText = "Agregar Producto";
+    const accederObjeto = (id) => {
 
-            alerta__title__closeButton = document.createElement("a");
-            if(darkMode){
-                alerta__title__closeButton.innerHTML = `<svg class="alert__button--closeDark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-            </svg>`
+    
+        let producto = productos.find(el => el.id == id);
+        nombre.value = producto.nombre;
+        categoria.value = producto.categoria;
+        precio.value = producto.precio;
+        costo.value = producto.costo;
+    }
+
+    eleccion || accederObjeto(id);
+
+    boton.onclick = () => {
+        
+
+        const valorarCategoria = () => {
+            let categoriaValorar = categorias.find(el => el.toLowerCase() == categoria.value.toLowerCase());
+            if(categoriaValorar == undefined){
+                return true;
             } else {
-                alerta__title__closeButton.innerHTML = `<svg class="alert__button--close" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-            </svg>`
+                return false;
             }
-            alerta__title__closeButton.setAttribute("href", "#");
-            alerta__title__closeButton.onclick = (e) => {
-                e.preventDefault();
-                cerrarAlerta();
-            }
-            alerta__title.appendChild(alerta__title__parrafo);
-            alerta__title.appendChild(alerta__title__closeButton);
+        }
 
-            //Agregando body a la alerta
-            alerta__body = document.createElement("div");
-            alerta__body.classList.add("alerta__producto__body");
-            alerta.appendChild(alerta__body);
 
-            //Agregando inputs a la alerta            
-            parrafo__nombre = document.createElement("p");
-            parrafo__nombre.innerText = "Nombre:"
-            nombre = document.createElement("input");
-            nombre.setAttribute("type", "text");
-            nombre.placeholder = "Nombre";
-            nombre.classList.add("alerta__producto__input");
-            alerta__body.appendChild(parrafo__nombre);
-            alerta__body.appendChild(nombre);
+        const valorarProducto = () => {
+            error.innerText = "";
 
-            parrafo__categoria = document.createElement("p");
-            parrafo__categoria.innerText = "Categoria:"
-            categoria = document.createElement("input");
-            categoria.setAttribute("type", "text");
-            categoria.placeholder = "Categoria";
-            categoria.classList.add("alerta__producto__input");
-            alerta__body.appendChild(parrafo__categoria);
-            alerta__body.appendChild(categoria);
+            if(nombre.value.trim() == ""){
+                error.innerText = "El nombre no puede estar vacio";
+                return;
+            }else if(valorarCategoria()){
+                error.innerText = "No se encuentra la categoria ¿Desea agregarla?";
 
-            parrafo__cantidad = document.createElement("p");
-            parrafo__cantidad.innerText = "Cantidad:"
-            cantidad = document.createElement("input");
-            cantidad.setAttribute("type", "number");
-            cantidad.placeholder = "Cantidad"
-            cantidad.classList.add("alerta__producto__input");
-            alerta__body.appendChild(parrafo__cantidad);
-            alerta__body.appendChild(cantidad);
+                let contenedor = document.createElement("div");
+                contenedor.classList.add("alerta__producto__contenedor__botones")
+                contenedor.innerHTML = `
+                <a href="#" id="categoriaAceptar" class="alerta__producto__aceptar">Agregar</a>
+                <a href="#" id="categoriaCancelar" class="alerta__producto__cancelar">Cancelar</a>
+                `
+                let aceptar = contenedor.querySelector("#categoriaAceptar");
+                let cancelar = contenedor.querySelector("#categoriaCancelar");
 
-            parrafo__precio = document.createElement("p");
-            parrafo__precio.innerText = "Precio:"
-            precio = document.createElement("input");
-            precio.setAttribute("type", "number");
-            precio.placeholder = "Precio";
-            precio.classList.add("alerta__producto__input");
-            alerta__body.appendChild(parrafo__precio);
-            alerta__body.appendChild(precio);
-
-            parrafo__costo = document.createElement("p");
-            parrafo__costo.innerText = "Costo:"
-            costo = document.createElement("input");
-            costo.setAttribute("type", "number");
-            costo.placeholder = "Costo";
-            costo.classList.add("alerta__producto__input");
-            alerta__body.appendChild(parrafo__costo);
-            alerta__body.appendChild(costo);
-
-            alerta__producto__boton = document.createElement("a");
-            alerta__producto__boton.setAttribute("href", "#");
-            alerta__producto__boton.classList.add(verificarModo("alert__boton"));
-            alerta__producto__boton.innerText = "Agregar Producto";
-            alerta.appendChild(alerta__producto__boton);
-
-            //Agregando boton y dandole funcionalidad
-
-            error = document.createElement("p");
-            error.classList.add("alerta__error");
-            alerta__body.appendChild(error);
-
-            alerta__producto__boton.onclick = () => {
-                
-                const valorarCategoria = () => {
-                    let categoriaValorar = categorias.find(el => el.toLowerCase() == categoria.value.toLowerCase());
-                    if(categoriaValorar == undefined){
-                        return true;
-                    } else {
-                        return false;
-                    }
+                aceptar.onclick = (e) => {
+                    e.preventDefault();
+                    categorias.push(categoria.value);
+                    contenedor.remove();
+                    valorarProducto();
+                }
+                cancelar.onclick = (e) => {
+                    e.preventDefault();
+                    contenedor.remove();
+                    error.innerText = "";
                 }
 
-                const valorarProducto = () => {
-                    if(nombre.value.trim() == ""){
-                        error.innerText = "El nombre no puede estar vacio";
-                        return;
-                    } else if(valorarCategoria()){
-                        error.innerText = "No se encuentra la categoria ¿Desea agregarla?";
-
-                        let contenedor = document.createElement("div");
-                        contenedor.classList.add("alerta__producto__contenedor__botones")
-                        let aceptar = document.createElement("a");
-                        aceptar.setAttribute("href", "#")
-                        aceptar.innerText = "Agregar"
-                        aceptar.classList.add("alerta__producto__aceptar");
-                        
-                        let cancelar = document.createElement("a");
-                        cancelar.setAttribute("href", "#")
-                        cancelar.innerText = "Cancelar"
-                        cancelar.classList.add("alerta__producto__cancelar");
-                        aceptar.onclick = (e) => {
-                            e.preventDefault();
-                            categorias.push(categoria.value);
-                            contenedor.remove();
-                            valorarProducto();
-                        }
-                        cancelar.onclick = (e) => {
-                            e.preventDefault();
-                            contenedor.remove();
-                        }
-
-                        contenedor.appendChild(aceptar);
-                        contenedor.appendChild(cancelar);
-
-                        error.insertAdjacentElement("afterend", contenedor);
-                        return;                   
-                    } else if(cantidad.value == "" || parseInt(cantidad.value) < 0){
-                        error.innerText = "La cantidad no puede ser negativa o estar vacia";
-                        return;
-                    } else if(precio.value == "" || parseInt(precio.value) < 0){
-                        error.innerText = "El precio no puede ser negativa o estar vacia";
-                        return;
-                    } else if(costo.value == "" || parseInt(costo.value) < 0){
-                        error.innerText = "El costo no puede ser negativa o estar vacia";
-                        return;
-                    }
-
-                    let productoNuevo = new Producto(crearProducto(), nombre.value, categoria.value, parseInt(cantidad.value), parseInt(precio.value), parseInt(costo.value));
-                    productos.push(productoNuevo);
-                    alerta.remove();
-                    alerta__fondo.remove();
-                    renderProductos();
-                }  
-                valorarProducto();
-            }
-
-            document.body.appendChild(alerta__fondo);
-            document.body.appendChild(alerta);
-            break;
-        case "modificar":
-            if(document.querySelector(".alert") || document.querySelector(".alert--dark")){
-                cerrarAlerta();
-            }
-
-            alerta__fondo = document.createElement("div");
-            alerta__fondo.classList.add("alert__background");
-            alerta__fondo.onclick = () => {
-                cerrarAlerta();
-            }
-
-            //Agregando Alerta al fondo de la alerta
-            alerta = document.createElement("div");
-            alerta.classList.add(verificarModo("alert"));
-            alerta.classList.add("alert__producto");
-
-            alerta__title = document.createElement("div");
-            alerta__title.classList.add(verificarModo("alert__title"));
-            alerta.appendChild(alerta__title);
-
-            //Agregando Parrafo y Boton al Titulo
-            alerta__title__parrafo = document.createElement("p");
-            alerta__title__parrafo.innerText = "Modificar Producto";
-
-            alerta__title__closeButton = document.createElement("a");
-            if(darkMode){
-                alerta__title__closeButton.innerHTML = `<svg class="alert__button--closeDark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-            </svg>`
-            } else {
-                alerta__title__closeButton.innerHTML = `<svg class="alert__button--close" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-            </svg>`
-            }
-            alerta__title__closeButton.setAttribute("href", "#");
-            alerta__title__closeButton.onclick = (e) => {
-                e.preventDefault();
-                cerrarAlerta();
-            }
-            alerta__title.appendChild(alerta__title__parrafo);
-            alerta__title.appendChild(alerta__title__closeButton);
-
-            //Agregando body a la alerta
-            alerta__body = document.createElement("div");
-            alerta__body.classList.add("alerta__producto__body");
-            alerta.appendChild(alerta__body);
-
-            buscarProducto = productos.find(el => el.id == id);
-
-            //Agregandole inputs a la alerta
-            parrafo__nombre = document.createElement("p");
-            parrafo__nombre.innerText = "Nombre:"
-            nombre = document.createElement("input");
-            nombre.setAttribute("type", "text");
-            nombre.placeholder = "Nombre";
-            nombre.value = buscarProducto.nombre;
-            nombre.classList.add("alerta__producto__input");
-            alerta__body.appendChild(parrafo__nombre);
-            alerta__body.appendChild(nombre);
-
-            parrafo__categoria = document.createElement("p");
-            parrafo__categoria.innerText = "Categoria:"
-            categoria = document.createElement("input");
-            categoria.setAttribute("type", "text");
-            categoria.placeholder = "Categoria";
-            categoria.value = buscarProducto.categoria;
-            categoria.classList.add("alerta__producto__input");
-            alerta__body.appendChild(parrafo__categoria);
-            alerta__body.appendChild(categoria);
-
-            parrafo__precio = document.createElement("p");
-            parrafo__precio.innerText = "Precio:"
-            precio = document.createElement("input");
-            precio.setAttribute("type", "number");
-            precio.placeholder = "Precio";
-            precio.value = parseInt(buscarProducto.precio);
-            precio.classList.add("alerta__producto__input");
-            alerta__body.appendChild(parrafo__precio);
-            alerta__body.appendChild(precio);
-
-            parrafo__costo = document.createElement("p");
-            parrafo__costo.innerText = "Costo:"
-            costo = document.createElement("input");
-            costo.setAttribute("type", "number");
-            costo.placeholder = "Costo";
-            costo.value = parseInt(buscarProducto.costo);
-            costo.classList.add("alerta__producto__input");
-            alerta__body.appendChild(parrafo__costo);
-            alerta__body.appendChild(costo);
-
-            alerta__producto__boton = document.createElement("a");
-            alerta__producto__boton.setAttribute("href", "#");
-            alerta__producto__boton.classList.add(verificarModo("alert__boton"));
-            alerta__producto__boton.innerText = "Modificar Producto";
-            alerta.appendChild(alerta__producto__boton);
-
-
-            //Agregando boton a la alerta y agregandole funcionalidad
-            error = document.createElement("p");
-            error.classList.add("alerta__error");
-            alerta__body.appendChild(error);
-
-            alerta__producto__boton.onclick = () => {
-                
-                const valorarCategoria = () => {
-                    let categoriaValorar = categorias.find(el => el.toLowerCase() == categoria.value.toLowerCase());
-                    if(categoriaValorar == undefined){
-                        return true;
-                    } else {
-                        return false;
-                    }
+                error.insertAdjacentElement("beforeend", contenedor);
+                return;                   
+            } else if(eleccion){
+                if(cantidad.value == "" || parseInt(cantidad.value) < 0){
+                    error.innerText = "La cantidad no puede ser negativa o estar vacia";
+                    return;    
                 }
-
-                const valorarProducto = () => {
-                    if(nombre.value.trim() == ""){
-                        error.innerText = "El nombre no puede estar vacio";
-                        return;
-                    } else if(valorarCategoria()){
-                        error.innerText = "No se encuentra la categoria ¿Desea agregarla?";
-
-                        let contenedor = document.createElement("div");
-                        contenedor.classList.add("alerta__producto__contenedor__botones")
-                        let aceptar = document.createElement("a");
-                        aceptar.setAttribute("href", "#")
-                        aceptar.innerText = "Agregar"
-                        aceptar.classList.add("alerta__producto__aceptar");
-                        
-                        let cancelar = document.createElement("a");
-                        cancelar.setAttribute("href", "#")
-                        cancelar.innerText = "Cancelar"
-                        cancelar.classList.add("alerta__producto__cancelar");
-                        aceptar.onclick = (e) => {
-                            e.preventDefault();
-                            categorias.push(categoria.value);
-                            contenedor.remove();
-                            valorarProducto();
-                        }
-                        cancelar.onclick = (e) => {
-                            e.preventDefault();
-                            contenedor.remove();
-                        }
-
-                        contenedor.appendChild(aceptar);
-                        contenedor.appendChild(cancelar);
-
-                        error.insertAdjacentElement("afterend", contenedor);
-                        return;                   
-                    } else if(precio.value == "" || parseInt(precio.value) < 0){
-                        error.innerText = "El precio no puede ser negativa o estar vacia";
-                        return;
-                    } else if(costo.value == "" || parseInt(costo.value) < 0){
-                        error.innerText = "El costo no puede ser negativa o estar vacia";
-                        return;
-                    }
-
-                    buscarProducto = productos.indexOf(productos.find(el => el.id == id))
-                    productos[buscarProducto].nombre = nombre.value;
-                    productos[buscarProducto].categoria = categoria.value;
-                    productos[buscarProducto].precio = parseInt(precio.value);
-                    productos[buscarProducto].costo = parseInt(costo.value);
-                    alerta.remove();
-                    alerta__fondo.remove();
-                    renderProductos();
-                }  
-                valorarProducto();
+            } else if(precio.value == "" || parseInt(precio.value) < 0){
+                error.innerText = "El precio no puede ser negativa o estar vacia";
+                return;
+            } else if(costo.value == "" || parseInt(costo.value) < 0){
+                error.innerText = "El costo no puede ser negativa o estar vacia";
+                return;
             }
 
-            document.body.appendChild(alerta__fondo);
-            document.body.appendChild(alerta)
-            break;
-        case "eliminar":
-            if(document.querySelector(".alert") || document.querySelector(".alert--dark")){
-                cerrarAlerta();
-            }
-
-            alerta__fondo = document.createElement("div");
-            alerta__fondo.classList.add("alert__background");
-            alerta__fondo.onclick = () => {
-                cerrarAlerta();
-            }
-
-            //Agregando Alerta al fondo de la alerta
-            alerta = document.createElement("div");
-            alerta.classList.add(verificarModo("alert"));
-            alerta.classList.add("alert__producto--eliminar");
-
-            alerta__title = document.createElement("div");
-            alerta__title.classList.add(verificarModo("alert__title"));
-            alerta.appendChild(alerta__title);
-
-            //Agregando Parrafo y Boton al Titulo
-            alerta__title__parrafo = document.createElement("p");
-            alerta__title__parrafo.innerText = "Eliminar Producto";
-
-            alerta__title__closeButton = document.createElement("a");
-            if(darkMode){
-                alerta__title__closeButton.innerHTML = `<svg class="alert__button--closeDark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-            </svg>`
+            if(eleccion){
+                let productoNuevo = new Producto(crearProducto(), nombre.value, categoria.value, eleccion && parseInt(cantidad.value), parseInt(precio.value), parseInt(costo.value));
+                productos.push(productoNuevo);
+                nuevaAlerta.cerrarAlerta()
+                renderProductos();
             } else {
-                alerta__title__closeButton.innerHTML = `<svg class="alert__button--close" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-            </svg>`
-            }
-            alerta__title__closeButton.setAttribute("href", "#");
-            alerta__title__closeButton.onclick = (e) => {
-                e.preventDefault();
-                cerrarAlerta();
-            }
-            alerta__title.appendChild(alerta__title__parrafo);
-            alerta__title.appendChild(alerta__title__closeButton);
-
-            //Agregando body a la alerta
-            alerta__body = document.createElement("div");
-            alerta__body.classList.add("alerta__producto__body");
-            alerta.appendChild(alerta__body);
-
-            buscarProducto = productos.find(el => el.id == id);
-
-            let parrafo__body = document.createElement("p");
-            parrafo__body.innerText = `¿Esta seguro que desea eliminar ${buscarProducto.nombre}?`;
-            alerta__body.appendChild(parrafo__body);
-
-            
-            let contenedor = document.createElement("div");
-            contenedor.classList.add("alerta__producto__contenedor__botones");
-
-            aceptar = document.createElement("a");
-            aceptar.classList.add("alerta__producto__aceptar");
-            aceptar.innerText = "Aceptar";
-
-            cancelar = document.createElement("a");
-            cancelar.classList.add("alerta__producto__cancelar");
-            cancelar.innerText = "Cancelar";
-            contenedor.appendChild(aceptar);
-            contenedor.appendChild(cancelar);
-
-            alerta__body.appendChild(contenedor);
-
-            aceptar.onclick = () => {
-                buscarProducto = productos.indexOf(buscarProducto);
-                productos.splice(buscarProducto, 1);
-                cerrarAlerta();
+                let buscarProducto = productos.indexOf(productos.find(el => el.id == id))
+                productos[buscarProducto].nombre = nombre.value;
+                productos[buscarProducto].categoria = categoria.value;
+                productos[buscarProducto].precio = precio.value;
+                productos[buscarProducto].costo = costo.value;
+                nuevaAlerta.cerrarAlerta()
                 renderProductos();
             }
+            
+        }
 
-            cancelar.onclick = () => {
-                cerrarAlerta();
-            }
+        valorarProducto();
+    }
 
-            document.body.appendChild(alerta__fondo);
-            document.body.appendChild(alerta);
-            break;
+    nuevaAlerta.agregarBody(divInputs);
+    alerta.appendChild(boton);
+}
+
+const eliminarProducto = (id) => {
+
+    if(Alerta.verificarAlertas()){
+        document.body.querySelector(".alert").remove();
+        document.body.querySelector(".alert__background").remove();
+    }
+
+    const nuevaAlerta = new Alerta(20, 10);
+    nuevaAlerta.agregarTitulo("Eliminar Producto");
+    let alerta = nuevaAlerta.iniciarAlerta();
+
+    let buscarProducto = productos.find(el => el.id == id);
+
+    let contenedor = document.createElement("div");
+    contenedor.innerHTML = `
+    <p>¿Esta seguro que desea eliminar ${buscarProducto.nombre}?</p>
+    <div class="alerta__producto__contenedor__botones">
+        <a href="#" id="eliminarAceptar" class="alerta__producto__aceptar">Aceptar</a>
+        <a href="#" id="eliminarCancelar" class="alerta__producto__cancelar">Cancelar</a>
+    </div>
+    `
+    nuevaAlerta.agregarBody(parrafo__body);
+    
+    let aceptar = contenedor.querySelector("#eliminarAceptar");
+    let cancelar = contenedor.querySelector("#eliminarCancelar");
+
+    aceptar.onclick = () => {
+        buscarProducto = productos.indexOf(buscarProducto);
+        productos.splice(buscarProducto, 1);
+        nuevaAlerta.cerrarAlerta();
+        renderProductos();
+    }
+
+    cancelar.onclick = () => {
+        nuevaAlerta.cerrarAlerta();
     }
 }
+
 
 document.querySelector("#comprar").onclick = () => {
     crearAlerta(true);

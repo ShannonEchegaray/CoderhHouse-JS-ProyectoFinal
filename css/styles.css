@@ -237,7 +237,7 @@ header div{
 }
 
 .alerta__producto__input{
-    width: 15em;
+    width: 100%;
     text-align: center;
     margin: 0 0 1em 0;
 }
@@ -290,11 +290,6 @@ header div{
     color: #eee;
     padding: 5px;
     transition: 0.3s;
-}
-
-.alert__ComprarVender{
-    width: 60vw;
-    height: 80vh;
 }
 
 .alert__title{
