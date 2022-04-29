@@ -347,7 +347,7 @@ const crearAlerta = (comprar) => {
                         let id = columnas[1].innerText;
                         let nombre = columnas[2].innerText;
                         let cantidad = parseInt(columnas[0].firstChild.value);
-                        let precio = parseInt(columnas[3].innerText)
+                        let precio = parseInt(columnas[3].innerText);
     
                         nuevaLista.id.push(id)
                         nuevaLista.nombre.push(nombre);
@@ -355,9 +355,10 @@ const crearAlerta = (comprar) => {
                         nuevaLista.precio.push(precio);
                         nuevaLista.precioFinal = precioFinal;
     
-                        productos.find(el => el.id == id).agregarStock(cantidad);
+                        productos.find(el => el.id == id).cantidad += cantidad;
                     }
                 }
+                guardarStorage(productos, "productos")
                 historialCompras.push(nuevaLista);
                 nuevaAlerta.cerrarAlerta();
                 renderProductos();
@@ -393,9 +394,10 @@ const crearAlerta = (comprar) => {
                         nuevaLista.precio.push(precio);
                         nuevaLista.precioFinal = precioFinal;
     
-                        productos.find(el => el.id == id).venderProducto(cantidad);
+                        productos.find(el => el.id == id).cantidad -= cantidad;
                     }
                 }
+                guardarStorage(productos, "productos")
                 historialVentas.push(nuevaLista);
                 nuevaAlerta.cerrarAlerta();
                 renderProductos();
