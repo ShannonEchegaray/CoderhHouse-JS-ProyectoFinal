@@ -242,7 +242,7 @@ const crearAlerta = (comprar) => {
     }
 
     const nuevaAlerta = new Alerta(60, 80);
-    nuevaAlerta.agregarTitulo("hola")
+    nuevaAlerta.agregarTitulo(comprar ? "Comprar" : "Vender")
     const alerta = nuevaAlerta.iniciarAlerta();
     
     const tabla = document.createElement("div");
