@@ -1,4 +1,5 @@
 //Variables generales
+// Se verifica que las variables esten en el localStorage, si no se inicializan como vacias
 const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
 const productos = JSON.parse(localStorage.getItem("productos")) || [];
 const historialCompras = [];
@@ -15,14 +16,6 @@ class Producto{
         this.precio = precio;
         this.costo = costo;
         this.moneda = "ARS"
-    }
-
-    agregarStock(cantidad){
-        this.cantidad += cantidad;
-    }
-
-    venderProducto(cantidad){
-        this.cantidad -= cantidad;
     }
 }
 
@@ -219,6 +212,7 @@ const setearModo = () => {
 
 // Eventos del header
 document.querySelector("#modoPagina").onclick = () => {
+    // Se utiliza operador ternario para permutar el false y true cada vez que llamen la funcion
     darkMode = darkMode ? false : true;
     guardarStorage(darkMode, "modoOscuro");
     setearModo();
@@ -242,7 +236,8 @@ const crearAlerta = (comprar) => {
     }
 
     const nuevaAlerta = new Alerta(60, 80);
-    nuevaAlerta.agregarTitulo(comprar ? "Comprar" : "Vender")
+    // Se utiliza operador ternario para verificar agregar el titulo
+    nuevaAlerta.agregarTitulo(comprar ? "Comprar Productos" : "Vender Productos")
     const alerta = nuevaAlerta.iniciarAlerta();
     
     const tabla = document.createElement("div");
@@ -271,6 +266,7 @@ const crearAlerta = (comprar) => {
         tabla__producto.classList.add("alert__table__product");
         tabla.appendChild(tabla__producto);
 
+        // Se utiliza operador ternario en la tabla para saber si utilizar el precio o el costo del producto
         tabla__producto.innerHTML = `
         <div class="alert__table__product__text"><input class="alert__table__product__text" type="Number" pattern="[^0-9+]"></div>
         <p class="alert__table__product__text">${producto.id}</p>
@@ -421,7 +417,8 @@ const insertOrModify = (eleccion, id) =>{
     let alerta = nuevaAlerta.iniciarAlerta();
 
     const divInputs = document.createElement("div");
-    divInputs.classList.add("alerta__producto__body")
+    divInputs.classList.add("alerta__producto__body");
+    // Se utiliza el operador ternario, para agregar el campo "Cantidad", y si se esta agregando un producto o modificando
     divInputs.innerHTML = `
     <p>Nombre:</p>
     <input type="text" id="inputNombre" placeholder="Nombre" class="alerta__producto__input">
