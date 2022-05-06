@@ -67,6 +67,50 @@ header div{
     background-color: rgba(0, 0, 0, 0.259);
 }
 
+.header__historial{
+    position: relative;
+    margin: 0 5px;
+    text-decoration: none;
+    color: #eee;
+    padding: 10px 2px;
+}
+
+.header__historial:hover{
+    background-color: rgba(0, 0, 0, 0.259);
+}
+
+ul > ul{
+    position: absolute;
+    left: -5em;
+    display: none;
+    list-style-type: none;
+}
+
+.header__historial:hover > ul{
+    display: block;
+}
+
+.header__historial__lista > li{
+    width: 22em;
+    padding: 10px 5px;
+    background-color: #55d;
+}
+
+.header__historial__lista--dark > li{
+    width: 22em;
+    padding: 10px 5px;
+    background-color: #d55;
+    color: #eee;
+}
+
+.header__historial__lista > li:hover{
+    outline: 1px solid black;
+}
+
+.header__historial__lista--dark > li:hover{
+    outline: 1px solid black;
+}
+
 .main{
     display: flex;
     flex-flow: row wrap;

@@ -2,8 +2,7 @@
 // Se verifica que las variables esten en el localStorage, si no se inicializan como vacias
 const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
 const productos = JSON.parse(localStorage.getItem("productos")) || [];
-const historialCompras = [];
-const historialVentas = [];
+const historial = [];
 let darkMode = JSON.parse(localStorage.getItem("modoOscuro")) || false;
 
 //Clases usadas en el programa
@@ -21,13 +20,13 @@ class Producto{
 
 class Lista{
     constructor(){
-        this.fecha = new Date();
-        this.fecha = this.fecha.toLocaleDateString() + " " + this.fecha.toTimeString();
+        this.fecha = `${crearFecha()}`;
         this.id = [];
         this.nombre = [];
         this.categoria = [];
         this.precio = [];
         this.cantidad = [];
+        this.texto = "";
         this.precioFinal = 0;
     }
 }
@@ -107,6 +106,21 @@ class Alerta{
     }
 }
 
+// Crear notificaciones
+const crearNotificacion = titulo => {
+    Toastify({
+        text: titulo,
+        duration: 3000,
+        gravity: "top",
+        position: "left",
+        style: {
+          background: `linear-gradient(to right, ${darkMode ? "#D10047, #EB6362" : "#80DAEB, #B2FFFF"})`,
+          color: darkMode ? "#eee" : "#000000",
+        },
+        onClick: function(){}
+      }).showToast();
+} 
+
 // Funcion para averiguar que id esta desocupada
 const crearProducto = () => {
     let id = 1;
@@ -114,6 +128,13 @@ const crearProducto = () => {
         id++;
     }
     return id;
+}
+
+// Funcion para crear una fecha
+const crearFecha = () => {
+    const date = new Date();
+    let fecha = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
+    return fecha;
 }
 
 // Funcion para una variable en en un storage
@@ -193,6 +214,23 @@ const renderProductos = () => {
     volcar.appendChild(card);
 }
 
+// Renderizar productos de la lista Historial
+// TODO Hacer que el cada li tenga un boton que crea una alerta con los detalles mas definidos
+const renderHistorial = () => {
+    let volcar = document.getElementById("historial");
+    while(volcar.firstChild) {
+        volcar.removeChild(volcar.firstChild);
+    }
+    for(const lista of historial){
+        let li = document.createElement("li");
+        li.classList.add(verificarModo("header__historial__lista"));
+
+        li.innerText = lista.texto;
+
+        volcar.appendChild(li);
+    } 
+}
+
 //Se unificaron las funciones para setear alertas
 //funcion Para setear el header, main, footer y alertas en el modo que corresponda
 const setearModo = () => {
@@ -206,6 +244,7 @@ const setearModo = () => {
         let alerta = document.querySelector(".alert--dark") || document.querySelector(".alert");
         alerta.classList = verificarModo("alert")     
     }
+    document.getElementById("historial").classList = verificarModo("header__historial__lista")
     renderProductos()
 }
 
@@ -354,10 +393,13 @@ const crearAlerta = (comprar) => {
                         productos.find(el => el.id == id).cantidad += cantidad;
                     }
                 }
+                nuevaLista.texto = `${nuevaLista.fecha} Se compro un producto por ${nuevaLista.precioFinal}`;
                 guardarStorage(productos, "productos")
-                historialCompras.push(nuevaLista);
+                historial.push(nuevaLista);
                 nuevaAlerta.cerrarAlerta();
                 renderProductos();
+                renderHistorial();
+                crearNotificacion(`${nuevaLista.fecha} Se Compro por ${precioFinal}`);
             }
         }
     
@@ -393,10 +435,13 @@ const crearAlerta = (comprar) => {
                         productos.find(el => el.id == id).cantidad -= cantidad;
                     }
                 }
+                nuevaLista.texto = `${nuevaLista.fecha} Se vendio un producto por ${nuevaLista.precioFinal}`;
                 guardarStorage(productos, "productos")
-                historialVentas.push(nuevaLista);
+                historial.push(nuevaLista);
                 nuevaAlerta.cerrarAlerta();
                 renderProductos();
+                renderHistorial();
+                crearNotificacion(`${nuevaLista.fecha} Se vendio por ${precioFinal}`);
             }
         }
     }
