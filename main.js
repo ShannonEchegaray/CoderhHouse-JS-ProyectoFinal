@@ -754,10 +754,15 @@ renderProductos();
 /* Esta API solo te permite 24 horas de un link de una imagen */
 // TODO Averiguar una forma de que las imagenes se puedan re buscar en pixabay
 const pruebaPrueba = async () => {
+    let prueba = productos.forEach(el => {
+        if(el.imgId != undefined){
+            prueba = el.imgId;
+        }
+    })
     if(productos[0] != null){
         console.log(intervalId);
         try{
-            let response = await fetch(`https://pixabay.com/api/?key=${apiKey}&id=${productos[0].imgId}`);
+            let response = await fetch(`https://pixabay.com/api/?key=${apiKey}&id=${prueba.imgId}`);
             if(response.status == 400){
                 for(producto of productos){
                     if(producto.imgId != undefined){
