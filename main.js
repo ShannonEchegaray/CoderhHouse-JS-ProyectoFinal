@@ -1,3 +1,5 @@
+// Introducir API KEY de pixabay
+let apiKey = "27361442-1be21d83d9270ab40f280a7b1";
 //Variables generales
 // Se verifica que las variables esten en el localStorage, si no se inicializan como vacias
 const categorias = JSON.parse(localStorage.getItem("categorias")) || [];
@@ -15,6 +17,8 @@ class Producto{
         this.precio = precio;
         this.costo = costo;
         this.moneda = "ARS"
+        this.img;
+        this.imgId;
     }
 }
 
@@ -45,7 +49,7 @@ class Alerta{
         } else {
             this.alerta.style.width = `${tamanox}vw`
         }
-        this.alerta.style.minHeight = `${tamanoy}vh`
+        this.alerta.style.height = `${tamanoy}vh`
     
         this.alerta.classList.add(verificarModo("alert"));
     }
@@ -104,6 +108,21 @@ class Alerta{
         this.alerta.remove();
         this.fondo.remove();
     }
+}
+
+
+// Funcion crear listado de imagenes - Asincrona
+const listaDeImagenes = async (keywords) => {
+    let resultado
+    try{
+        let response = await fetch(`https://pixabay.com/api/?key=${apiKey}&q=${keywords}`);
+        let data = await response.json();
+        resultado = data.hits;
+    } catch(e) {
+        resultado = new Error(`Sucedio un inconveniente con la llamada a las imagenes de pixabay
+        ${e}`)
+    }
+    return resultado;
 }
 
 // Crear notificaciones
@@ -165,27 +184,33 @@ const renderProductos = () => {
         card.setAttribute("class", verificarModo("card"));
 
         card.innerHTML = `
-        <div class="card__body">
-            <div class="contenedor__titulo">
-                <h5 class="card__title">${producto.nombre}</h5>
-                <div>
-                    <a href="#" class="no-decoration">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil ${verificarModo("ico__productos")}" viewBox="0 0 16 16">
-                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                        </svg>
-                    </a>
-                    <a href="#" class="no-decoration">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg ${verificarModo("ico__productos")}" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z"/>
-                            <path fill-rule="evenodd" d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z"/>
-                        </svg>
-                    </a>
-                </div>
+        <div>
+            <div>
+                <img src="${producto.img? producto.img : "./img/img-not-found.png"}" alt="" class="img-fluid border-card">
             </div>
-            <p class="card__text">Categoria: ${producto.categoria}</p>
-            <p class="card__text">Cantidad: ${producto.cantidad}</p>
-            <p class="card__text">Precio: ${producto.precio}</p>
-            <p class="card__text">Costo: ${producto.costo}</p>
+            <div class="card__body">
+                <div class="contenedor__titulo">
+                    <h5 class="card__title">${producto.nombre}</h5>
+                    <div>
+                        <a href="#" class="no-decoration">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil ${verificarModo("ico__productos")}" viewBox="0 0 16 16">
+                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="no-decoration">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg ${verificarModo("ico__productos")}" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z"/>
+                                <path fill-rule="evenodd" d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <p class="card__text">Categoria: ${producto.categoria}</p>
+                <p class="card__text">Cantidad: ${producto.cantidad}</p>
+                <p class="card__text">Precio: ${producto.precio}</p>
+                <p class="card__text">Costo: ${producto.costo}</p>
+            </div>
+            
         </div>
         `
 
@@ -568,6 +593,7 @@ const insertOrModify = (eleccion, id) =>{
                 guardarStorage(productos, "productos")
                 nuevaAlerta.cerrarAlerta()
                 renderProductos();
+                galeriaDeImagenes(productoNuevo);
             } else {
                 let buscarProducto = productos.indexOf(productos.find(el => el.id == id))
                 productos[buscarProducto].nombre = nombre.value;
@@ -577,6 +603,7 @@ const insertOrModify = (eleccion, id) =>{
                 guardarStorage(productos, "productos")
                 nuevaAlerta.cerrarAlerta()
                 renderProductos();
+                galeriaDeImagenes(productos[buscarProducto]);
             }
             
         }
@@ -627,6 +654,101 @@ const eliminarProducto = (id) => {
     }
 }
 
+const galeriaDeImagenes = (producto) => {
+    const alertaAgregarImagen = () => {
+        if(Alerta.verificarAlertas()){
+            document.body.querySelector(`.${verificarModo("alert")}`).remove();
+            document.body.querySelector(".alert__background").remove();
+        }
+    
+        const nuevaAlerta = new Alerta(25, 10);
+        nuevaAlerta.agregarTitulo("Agregar Imagen");
+        nuevaAlerta.iniciarAlerta();
+    
+        let contenedor = document.createElement("div");
+        contenedor.innerHTML = `
+        <p class="alerta__producto__eliminar">¿Desea Agregar Imagen a ${producto.nombre}?</p>
+        <div class="alerta__producto__contenedor__botones">
+            <a href="#" id="eliminarAceptar" class="alerta__producto__aceptar">Aceptar</a>
+            <a href="#" id="eliminarCancelar" class="alerta__producto__cancelar">Cancelar</a>
+        </div>
+        `
+        nuevaAlerta.agregarBody(contenedor);
+        
+        let aceptar = contenedor.querySelector("#eliminarAceptar");
+        let cancelar = contenedor.querySelector("#eliminarCancelar");
+    
+        aceptar.onclick = () => {
+            nuevaAlerta.cerrarAlerta();
+            galeriaProductos();
+        }
+    
+        cancelar.onclick = () => {
+            nuevaAlerta.cerrarAlerta();
+        }
+    }
+    
+    const galeriaProductos = () => {
+        //Verifica si ya hay una alerta creada, y si ya esta creada se elimina la anterior
+        if(Alerta.verificarAlertas()){
+            document.body.querySelector(`.${verificarModo("alert")}`).remove();
+            document.body.querySelector(".alert__background").remove();
+        }
+
+        const nuevaAlerta = new Alerta(60, 80);
+        nuevaAlerta.agregarTitulo("Agregar Imagen")
+        const alerta = nuevaAlerta.iniciarAlerta();
+
+        const galeria = document.createElement("div");
+        galeria.classList.add("galeria");
+
+        const buscar = document.createElement("input");
+        buscar.classList.add("galeria__input")
+        buscar.type = "text";
+
+        buscar.onkeydown = async (e) => {
+            if(e.key == "Enter"){
+                let keywords = e.target.value;
+                if(keywords.includes(" ")){
+                    keywords.replace(" ", "+");
+                    console.log(keywords)
+                }
+                let resultados = await listaDeImagenes(keywords);
+                galeria__contenedor__imagenes.innerHTML = "";
+                for(imagenes of resultados){
+                    let contenedor = document.createElement("div");
+                    contenedor.innerHTML = `
+                    <img src=${imagenes.webformatURL} alt="" class="img-fluid">
+                    `
+                    galeria__contenedor__imagenes.appendChild(contenedor);
+
+                    console.log(contenedor.childNodes[1])
+
+                    contenedor.childNodes[1].onclick = (e) => {
+                        producto.img = e.target.getAttribute("src");
+                        producto.imgId = imagenes.id;
+                        nuevaAlerta.cerrarAlerta();
+                        guardarStorage(productos, "productos");
+                        renderProductos();
+                    }
+                }
+            }
+        }
+        galeria.appendChild(buscar);
+
+        const galeria__contenedor__imagenes = document.createElement("div");
+        galeria__contenedor__imagenes.classList.add("galeria__contenedor__imagenes");
+        galeria.appendChild(galeria__contenedor__imagenes);
+
+        nuevaAlerta.agregarBody(galeria);
+    }
+    
+    alertaAgregarImagen();
+}
+
 // Init Modo de pagina y Desplegar productos
 setearModo();
 renderProductos();
+
+/* Esta API solo te permite 24 horas de un link de una imagen */
+// TODO Averiguar una forma de que las imagenes se puedan re buscar en pixabay

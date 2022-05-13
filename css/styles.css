@@ -1,5 +1,11 @@
 /* General */
 
+.img-fluid{
+    width: 100%;
+    height: auto;
+    max-height: 8em;
+}
+
 *{
     margin:0;
     padding:0;
@@ -124,9 +130,20 @@ ul > ul{
     border-radius: 5px; 
     background-color: #fff;
     width: 12em;
-    height: 8em;
-    padding: 10px;
     transition: 0.3s ease;
+}
+
+.card > div{
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card--dark > div{
+    height: 100%;
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .card--dark{
@@ -136,10 +153,17 @@ ul > ul{
     border-radius: 5px; 
     background-color: #323232;
     width: 12em;
-    height: 8em;
-    padding: 10px;
     color: #eee;
     transition: 0.3s ease;
+}
+
+.card__body{
+    padding: 0.5em;
+}
+
+.border-card{
+    border-start-end-radius: 5px;
+    border-start-start-radius: 5px;
 }
 
 .contenedor__titulo{
@@ -386,6 +410,8 @@ ul > ul{
 
 .alert__body{
     position: relative;
+    height: 90%;
+    overflow-y: auto;
 }
 
 .alert__table{
@@ -447,4 +473,33 @@ ul > ul{
     position: absolute;
     left: 10px;
     bottom: 12px;
+}
+
+/* Galeria */
+
+.galeria{
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.galeria__input{
+    width: 30%;
+    min-width: 100px;
+}
+
+.galeria__contenedor__imagenes{
+    margin-top: 1em;
+    overflow-x: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 1em;
+    justify-items: center;
+    align-items: center;
+}
+
+.galeria__contenedor__imagenes div{
+    padding: 10px;
 }
