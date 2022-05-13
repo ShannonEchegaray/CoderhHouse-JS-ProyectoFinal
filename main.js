@@ -718,19 +718,20 @@ const galeriaDeImagenes = (producto) => {
                 for(imagenes of resultados){
                     let contenedor = document.createElement("div");
                     contenedor.innerHTML = `
-                    <img src=${imagenes.webformatURL} alt="" class="img-fluid">
+                    <img src=${imagenes.webformatURL} alt="" class="img-fluid" data-id="${imagenes.id}">
                     `
-                    galeria__contenedor__imagenes.appendChild(contenedor);
-
-                    console.log(contenedor.childNodes[1])
-
                     contenedor.childNodes[1].onclick = (e) => {
+                        console.log(imagenes.webformatURL);
+                        console.log(e.target);
                         producto.img = e.target.getAttribute("src");
-                        producto.imgId = imagenes.id;
+                        producto.imgId = e.target.getAttribute("data-id");
                         nuevaAlerta.cerrarAlerta();
                         guardarStorage(productos, "productos");
                         renderProductos();
                     }
+
+                    galeria__contenedor__imagenes.appendChild(contenedor);
+                    console.log(contenedor.childNodes[1])
                 }
             }
         }
@@ -752,3 +753,30 @@ renderProductos();
 
 /* Esta API solo te permite 24 horas de un link de una imagen */
 // TODO Averiguar una forma de que las imagenes se puedan re buscar en pixabay
+const pruebaPrueba = async () => {
+    if(productos[0] != null){
+        console.log(intervalId);
+        try{
+            let response = await fetch(`https://pixabay.com/api/?key=${apiKey}&id=${productos[0].imgId}`);
+            if(response.status == 400){
+                for(producto of productos){
+                    if(producto.imgId != undefined){
+                        let respuesta = await fetch(`https://pixabay.com/api/?key=${apiKey}&id=${producto.imgId}`);
+                        let dato = await respuesta.json();
+                        dato = dato.hits[0];
+                        producto.img = dato.webformatURL;
+                        producto.imgId = dato.id;
+                        console.log(dato.webformatURL);
+                        console.log(dato.id);
+                    }
+                }
+                guardarStorage(productos, "productos");
+                renderProductos();
+            }
+        } catch(e){
+            console.log(e)
+        }
+    }
+}
+
+const intervalId = window.setInterval(pruebaPrueba, 300000);
