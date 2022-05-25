@@ -256,7 +256,6 @@ const renderHistorial = () => {
     } 
 }
 
-//Se unificaron las funciones para setear alertas
 //funcion Para setear el header, main, footer y alertas en el modo que corresponda
 const setearModo = () => {
     const body = document.querySelector("body");
@@ -754,12 +753,13 @@ renderProductos();
 /* Esta API solo te permite 24 horas de un link de una imagen */
 // TODO Averiguar una forma de que las imagenes se puedan re buscar en pixabay
 const pruebaPrueba = async () => {
-    let prueba = productos.forEach(el => {
+    let prueba;
+    productos.forEach(el => {
         if(el.imgId != undefined){
             prueba = el.imgId;
         }
     })
-    if(productos[0] != null){
+    if(prueba != undefined){
         console.log(intervalId);
         try{
             let response = await fetch(`https://pixabay.com/api/?key=${apiKey}&id=${prueba.imgId}`);
