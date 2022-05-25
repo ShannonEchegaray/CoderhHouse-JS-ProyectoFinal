@@ -710,7 +710,6 @@ const galeriaDeImagenes = (producto) => {
                 let keywords = e.target.value;
                 if(keywords.includes(" ")){
                     keywords.replace(" ", "+");
-                    console.log(keywords)
                 }
                 let resultados = await listaDeImagenes(keywords);
                 galeria__contenedor__imagenes.innerHTML = "";
@@ -720,8 +719,6 @@ const galeriaDeImagenes = (producto) => {
                     <img src=${imagenes.webformatURL} alt="" class="img-fluid" data-id="${imagenes.id}">
                     `
                     contenedor.childNodes[1].onclick = (e) => {
-                        console.log(imagenes.webformatURL);
-                        console.log(e.target);
                         producto.img = e.target.getAttribute("src");
                         producto.imgId = e.target.getAttribute("data-id");
                         nuevaAlerta.cerrarAlerta();
@@ -730,7 +727,6 @@ const galeriaDeImagenes = (producto) => {
                     }
 
                     galeria__contenedor__imagenes.appendChild(contenedor);
-                    console.log(contenedor.childNodes[1])
                 }
             }
         }
@@ -760,7 +756,6 @@ const pruebaPrueba = async () => {
         }
     })
     if(prueba != undefined){
-        console.log(intervalId);
         try{
             let response = await fetch(`https://pixabay.com/api/?key=${apiKey}&id=${prueba.imgId}`);
             if(response.status == 400){
@@ -771,8 +766,6 @@ const pruebaPrueba = async () => {
                         dato = dato.hits[0];
                         producto.img = dato.webformatURL;
                         producto.imgId = dato.id;
-                        console.log(dato.webformatURL);
-                        console.log(dato.id);
                     }
                 }
                 guardarStorage(productos, "productos");
